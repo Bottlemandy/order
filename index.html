@@ -105,11 +105,16 @@ input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;
 <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" 
         onload="if(submitted) {alert('訂單已成功送出！'); submitted = false;}"></iframe>
 <script>
-// 1. 補回：全域變數宣告
+// 1. 全域變數宣告 (用於表單提交控制)
 let submitted = false; 
+
+// 🚨 替換成您從 Google 試算表發布取得的 CSV 連結
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNhw1-j1jt0iMwuSDQq5JGARhl62lvNYGv2SksZU1nsJt56lhblp0in6S4kFmuPNvODcYZoU0MGwa6/pub?gid=1001423840&single=true&output=csv"; 
 
 const btn = document.getElementById('submitBtn');
 const wall = document.getElementById('orderList');
+
+// ... (getCheckedValues, getExtraPrice 函式保持不變) ...
 
 function getCheckedValues(selector){
   return Array.from(document.querySelectorAll(selector+":checked")).map(i=>i.value);
@@ -120,7 +125,64 @@ function getExtraPrice(){
     .reduce((sum, c)=>sum+Number(c.dataset.extra||0),0);
 }
 
+// ----------------------------------------------------
+// 🚨 核心新增函式：讀取並顯示所有已存在的訂單
+// ----------------------------------------------------
+async function loadPreviousOrders() {
+    try {
+        const response = await fetch(CSV_URL);
+        const text = await response.text();
+        
+        // 將 CSV 數據分割成行，並移除標題行
+        const rows = text.trim().split('\n').slice(1); 
+        
+        // CSV 數據順序: 
+        // [時間戳, entry.2028456225(名字), entry.1063987881(主菜), entry.1584438213(口味), entry.1774261695(配料), entry.2100294357(加料)]
+
+        rows.forEach(row => {
+            // 處理 CSV 的逗號分隔，同時處理逗號在引號內的狀況
+            const values = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(v => v.replace(/^"|"$/g, ''));
+            
+            // 由於 CSV 數據只有欄位值，沒有計算結果，我們只能顯示現有的欄位
+            const name = values[1] || '無名氏';
+            const mainName = values[2] || '未選主菜';
+            const flavor = values[3] || '無口味';
+            // 配料和加料可能是多選，用 ; 或 , 分隔，這裡假設用逗號分隔
+            const toppings = values[4] ? values[4].split(',').join('、') : '無';
+            const extras = values[5] ? values[5].split(',').join('、') : '無';
+
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.innerHTML = `
+                <h3>${name} (${values[0].substring(5, 16)})</h3>
+                <p><strong>主菜：</strong>${mainName}</p>
+                <p><strong>口味：</strong>${flavor}</p>
+                <p><strong>配料：</strong>${toppings}</p>
+                <p><strong>加料：</strong>${extras}</p>
+                <p><strong>總價：</strong>(需手動計算)</p>
+            `;
+            wall.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error('載入訂單失敗:', error);
+        // 如果載入失敗，給予使用者提示
+        wall.innerHTML = '<p style="color:red; text-align:center;">無法載入歷史訂單，請檢查 Google 試算表發布連結是否正確。</p>';
+    }
+}
+
+// ----------------------------------------------------
+// 3. 頁面載入時，執行載入歷史訂單
+// ----------------------------------------------------
+window.onload = loadPreviousOrders;
+
+
+// ----------------------------------------------------
+// 4. 點擊送出訂單
+// ----------------------------------------------------
 btn.onclick = ()=>{
+  // ... (您的點餐邏輯) ...
+
   const name = document.getElementById('userName').value.trim();
   if(!name){ alert('請輸入名字'); return; }
   const main = document.getElementById('mainDish');
@@ -144,11 +206,11 @@ btn.onclick = ()=>{
   `;
   wall.appendChild(card);
   
-  // 2. 補回：延遲提交 1 毫秒，確保資料傳輸完整性
-  submitted = true; // 確保變數有定義且設為 true
+  // 5. 確保沒有 'let'
+  submitted = true; 
   setTimeout(function() {
     document.querySelector('form').submit();
-  }, 1);
+  }, 1); 
 };
 </script>
 </body>
