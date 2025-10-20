@@ -142,7 +142,9 @@ btn.onclick = ()=>{
   wall.appendChild(card);
   submitted = true;
 
-  document.querySelector('form').submit();
+  setTimeout(function() {
+    document.querySelector('form').submit();
+  }, 1);
 };
 </script>
 </body>
