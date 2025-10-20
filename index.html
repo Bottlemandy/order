@@ -62,7 +62,8 @@ input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;
     <option value="雞肉" data-price="75">雞肉 $75</option>
     <option value="香腸" data-price="70">香腸 $70</option>
     <option value="培根" data-price="70">培根 $70</option>
-    <option value="牛蒡蔬果" data-price="70">牛蒡蔬果 $70</option>
+    <option value="牛蒡" data-price="70">牛蒡 $70</option>
+     <option value="蔬果" data-price="70">蔬果 $70</option>
   </select>
 
   <label>選口味：</label>
@@ -93,7 +94,9 @@ input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;
   <label><input type="checkbox" value="豆干" data-extra="5">豆干 +5</label>
   <label><input type="checkbox" value="菜" data-extra="5">菜 +5</label>
 
-  <button class="btn" id="submitBtn">送出訂單</button>
+  <form action="https://docs.google.com/forms/u/1/d/e/1FAIpQLSdzC23UxsTaj6Aw4JPvF4vEC4OBNoL-xxscENrWNcL5xgebJw/formResponse" method="POST">
+    <button class="btn" id="submitBtn">送出訂單</button>
+</form>
 
   <div class="order-wall" id="orderWall">
     <h2 style="color:#ff7b30;text-align:center;">目前訂單牆</h2>
