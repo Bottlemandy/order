@@ -58,7 +58,7 @@ input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;
     <input type="text" id="userName" name="entry.2028456225" placeholder="請輸入姓名">
 
     <label>選主菜：</label>
-    <select id="mainDish" name="entry.1063987881_sentinel">
+    <select id="mainDish" name="entry.1063987881">
       <option value="燒肉" data-price="75">燒肉 $75</option>
       <option value="雞肉" data-price="75">雞肉 $75</option>
       <option value="香腸" data-price="70">香腸 $70</option>
@@ -68,7 +68,7 @@ input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;
     </select>
 
     <label>選口味：</label>
-    <select id="flavor" name="entry.1584438213_sentinel">
+    <select id="flavor" name="entry.1584438213">
       <option>原味</option>
       <option>黑胡椒</option>
       <option>甜辣</option>
@@ -78,24 +78,24 @@ input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;
 
     <label>選配料（可多選，有勾選的就會加，沒有勾選的就不會出現在春捲裡^^）：</label>
     <div id="toppings">
-      <label><input type="checkbox" name="entry.1774261695_sentinel" value="紅蘿蔔">紅蘿蔔</label>
-      <label><input type="checkbox" name="entry.1774261695_sentinel" value="豆薯">豆薯</label>
-      <label><input type="checkbox" name="entry.1774261695_sentinel" value="煎蛋">煎蛋</label>
-      <label><input type="checkbox" name="entry.1774261695_sentinel" value="豆干">豆干</label>
-      <label><input type="checkbox" name="entry.1774261695_sentinel" value="蛋酥">蛋酥</label>
-      <label><input type="checkbox" name="entry.1774261695_sentinel" value="肉鬆海苔">肉鬆海苔</label>
-      <label><input type="checkbox" name="entry.1774261695_sentinel" value="高麗菜">高麗菜</label>
-      <label><input type="checkbox" name="entry.1774261695_sentinel" value="特製糖粉">特製糖粉</label>
+      <label><input type="checkbox" name="entry.1774261695" value="紅蘿蔔">紅蘿蔔</label>
+      <label><input type="checkbox" name="entry.1774261695" value="豆薯">豆薯</label>
+      <label><input type="checkbox" name="entry.1774261695" value="煎蛋">煎蛋</label>
+      <label><input type="checkbox" name="entry.1774261695" value="豆干">豆干</label>
+      <label><input type="checkbox" name="entry.1774261695" value="蛋酥">蛋酥</label>
+      <label><input type="checkbox" name="entry.1774261695" value="肉鬆海苔">肉鬆海苔</label>
+      <label><input type="checkbox" name="entry.1774261695" value="高麗菜">高麗菜</label>
+      <label><input type="checkbox" name="entry.1774261695" value="特製糖粉">特製糖粉</label>
     </div>
 
     <label>加料：</label>
-    <label><input type="checkbox" name="entry.2100294357_sentinel" value="加主菜" data-extra="10">加主菜 +10</label>
-    <label><input type="checkbox" name="entry.2100294357_sentinel" value="起士" data-extra="10">起士 +10</label>
-    <label><input type="checkbox" name="entry.2100294357_sentinel" value="蛋" data-extra="10">蛋 +10</label>
-    <label><input type="checkbox" name="entry.2100294357_sentinel" value="豆干" data-extra="5">豆干 +5</label>
-    <label><input type="checkbox" name="entry.2100294357_sentinel"value="菜" data-extra="5">菜 +5</label>
+    <label><input type="checkbox" name="entry.2100294357" value="加主菜" data-extra="10">加主菜 +10</label>
+    <label><input type="checkbox" name="entry.2100294357" value="起士" data-extra="10">起士 +10</label>
+    <label><input type="checkbox" name="entry.2100294357" value="蛋" data-extra="10">蛋 +10</label>
+    <label><input type="checkbox" name="entry.2100294357" value="豆干" data-extra="5">豆干 +5</label>
+    <label><input type="checkbox" name="entry.2100294357"value="菜" data-extra="5">菜 +5</label>
 
-    <button class="btn" id="submitBtn">送出訂單</button>
+    <button class="btn" id="submitBtn" type="button">送出訂單</button>
   </form>
   <div class="order-wall" id="orderWall">
     <h2 style="color:#ff7b30;text-align:center;">目前訂單牆</h2>
@@ -139,6 +139,8 @@ btn.onclick = ()=>{
     <p><strong>總價：</strong>NT$ ${total}</p>
   `;
   wall.appendChild(card);
+
+  document.querySelector('form').submit();
 
   // 清空部分欄位
   document.getElementById('userName').value='';
