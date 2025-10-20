@@ -145,7 +145,7 @@ btn.onclick = ()=>{
   wall.appendChild(card);
   
   // 2. 補回：延遲提交 1 毫秒，確保資料傳輸完整性
-let submitted = true; // 確保變數有定義且設為 true
+  submitted = true; // 確保變數有定義且設為 true
   setTimeout(function() {
     document.querySelector('form').submit();
   }, 1);
