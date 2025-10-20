@@ -143,12 +143,6 @@ btn.onclick = ()=>{
   submitted = true;
 
   document.querySelector('form').submit();
-
-  // 清空部分欄位
-  document.getElementById('userName').value='';
-  document.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false);
-  document.getElementById('mainDish').selectedIndex=0;
-  document.getElementById('flavor').selectedIndex=0;
 };
 </script>
 </body>
