@@ -102,7 +102,8 @@ input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;
     <div id="orderList"></div>
   </div>
 </div>
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {alert('訂單已成功送出！'); submitted = false;}"></iframe>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" 
+        onload="if(submitted) {alert('訂單已成功送出！'); submitted = false;}"></iframe>
 <script>
 // 1. 補回：全域變數宣告
 let submitted = false; 
@@ -144,10 +145,10 @@ btn.onclick = ()=>{
   wall.appendChild(card);
   
   // 2. 補回：延遲提交 1 毫秒，確保資料傳輸完整性
-  submitted = true;
+let submitted = true; // 確保變數有定義且設為 true
   setTimeout(function() {
     document.querySelector('form').submit();
-  }, 1); 
+  }, 1);
 };
 </script>
 </body>
