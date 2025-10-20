@@ -104,6 +104,7 @@ input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;
 </div>
 <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {alert('訂單已成功送出！');}"></iframe>
 <script>
+let submitted = false;
 const btn = document.getElementById('submitBtn');
 const wall = document.getElementById('orderList');
 
@@ -139,6 +140,8 @@ btn.onclick = ()=>{
     <p><strong>總價：</strong>NT$ ${total}</p>
   `;
   wall.appendChild(card);
+  submitted = true;
+  document.querySelector('form').submit();
 
 };
 </script>
