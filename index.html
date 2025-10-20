@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>香捲小霸王 — 點餐頁</title>
+<style>
+body{
+  font-family:"Noto Sans TC",sans-serif;
+  background:#fff8f3;
+  padding:20px;
+  color:#333;
+}
+.container{
+  max-width:750px;
+  margin:auto;
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.08);
+}
+h1{color:#ff7b30;text-align:center;margin-bottom:16px;}
+label{display:block;margin-bottom:6px;}
+input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;margin-bottom:10px;}
+.btn{
+  background:#ff7b30;color:white;padding:10px 16px;border:none;
+  border-radius:8px;cursor:pointer;width:100%;font-weight:600;
+}
+.btn:hover{background:#ff9147;}
+.order-wall{
+  margin-top:24px;
+  background:#fff7ee;
+  border-radius:12px;
+  padding:12px;
+}
+.order-card{
+  background:#fff;
+  border-radius:10px;
+  border:1px solid #ffe1c6;
+  padding:10px 14px;
+  margin-bottom:10px;
+}
+.order-card h3{
+  margin:0 0 6px 0;
+  color:#ff7b30;
+}
+.order-card p{
+  margin:4px 0;
+  font-size:14px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>香捲小霸王點餐頁</h1>
+  <label>你的名字：</label>
+  <input type="text" id="userName" placeholder="請輸入姓名">
+
+  <label>選主菜：</label>
+  <select id="mainDish">
+    <option value="燒肉" data-price="75">燒肉 $75</option>
+    <option value="雞肉" data-price="75">雞肉 $75</option>
+    <option value="香腸" data-price="70">香腸 $70</option>
+    <option value="培根" data-price="70">培根 $70</option>
+    <option value="牛蒡蔬果" data-price="70">牛蒡蔬果 $70</option>
+  </select>
+
+  <label>選口味：</label>
+  <select id="flavor">
+    <option>原味</option>
+    <option>黑胡椒</option>
+    <option>甜辣</option>
+    <option>芥末</option>
+    <option>辣味</option>
+  </select>
+
+  <label>選配料（可多選，有勾選的就會加，沒有勾選的就不會出現在春捲裡^^）：</label>
+  <div id="toppings">
+    <label><input type="checkbox" value="紅蘿蔔">紅蘿蔔</label>
+    <label><input type="checkbox" value="豆薯">豆薯</label>
+    <label><input type="checkbox" value="煎蛋">煎蛋</label>
+    <label><input type="checkbox" value="豆干">豆干</label>
+    <label><input type="checkbox" value="蛋酥">蛋酥</label>
+    <label><input type="checkbox" value="肉鬆海苔">肉鬆海苔</label>
+    <label><input type="checkbox" value="高麗菜">高麗菜</label>
+    <label><input type="checkbox" value="特製糖粉">特製糖粉</label>
+  </div>
+
+  <label>加料：</label>
+  <label><input type="checkbox" value="加主菜" data-extra="10">加主菜 +10</label>
+  <label><input type="checkbox" value="起士" data-extra="10">起士 +10</label>
+  <label><input type="checkbox" value="蛋" data-extra="10">蛋 +10</label>
+  <label><input type="checkbox" value="豆干" data-extra="5">豆干 +5</label>
+  <label><input type="checkbox" value="菜" data-extra="5">菜 +5</label>
+
+  <button class="btn" id="submitBtn">送出訂單</button>
+
+  <div class="order-wall" id="orderWall">
+    <h2 style="color:#ff7b30;text-align:center;">目前訂單牆</h2>
+    <div id="orderList"></div>
+  </div>
+</div>
+
+<script>
+const btn = document.getElementById('submitBtn');
+const wall = document.getElementById('orderList');
+
+function getCheckedValues(selector){
+  return Array.from(document.querySelectorAll(selector+":checked")).map(i=>i.value);
+}
+
+function getExtraPrice(){
+  return Array.from(document.querySelectorAll('input[type=checkbox][data-extra]:checked'))
+    .reduce((sum, c)=>sum+Number(c.dataset.extra||0),0);
+}
+
+btn.onclick = ()=>{
+  const name = document.getElementById('userName').value.trim();
+  if(!name){ alert('請輸入名字'); return; }
+  const main = document.getElementById('mainDish');
+  const mainName = main.value;
+  const basePrice = Number(main.selectedOptions[0].dataset.price);
+  const flavor = document.getElementById('flavor').value;
+  const toppings = getCheckedValues('#toppings input');
+  const extras = getCheckedValues('input[type=checkbox][data-extra]');
+  const extraPrice = getExtraPrice();
+  const total = basePrice + extraPrice;
+
+  const card = document.createElement('div');
+  card.className = 'order-card';
+  card.innerHTML = `
+    <h3>${name}</h3>
+    <p><strong>主菜：</strong>${mainName}</p>
+    <p><strong>口味：</strong>${flavor}</p>
+    <p><strong>配料：</strong>${toppings.length?toppings.join('、'):'無'}</p>
+    <p><strong>加料：</strong>${extras.length?extras.join('、'):'無'}</p>
+    <p><strong>總價：</strong>NT$ ${total}</p>
+  `;
+  wall.appendChild(card);
+
+  // 清空部分欄位
+  document.getElementById('userName').value='';
+  document.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false);
+  document.getElementById('mainDish').selectedIndex=0;
+  document.getElementById('flavor').selectedIndex=0;
+};
+</script>
+</body>
+</html>
