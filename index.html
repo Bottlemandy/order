@@ -105,114 +105,59 @@ input[type=text]{padding:8px;border-radius:8px;border:1px solid #ccc;width:100%;
 <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" 
         onload="if(submitted) {alert('訂單已成功送出！'); submitted = false;}"></iframe>
 <script>
-// 1. 全域變數宣告
-let submitted = false; 
+const API_URL = "https://script.google.com/macros/s/AKfycbxq6Zid6Balj_m35eFN8decnDNd5OHyAMjArjxdcXsdYwf-NRSnaS9wLOn1FqFrtVtSwA/exec";
 
-// 🚨 請確認這個連結是您最新發布的 CSV 連結
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNhw1-j1jt0iMwuSDQq5JGARhl62lvNYGv2SksZU1nsJt56lhblp0in6S4kFmuPNvODcYZoU0MGwa6/pub?gid=1001423840&single=true&output=csv"; 
-
-const btn = document.getElementById('submitBtn');
-const wall = document.getElementById('orderList');
-
-function getCheckedValues(selector){
-  return Array.from(document.querySelectorAll(selector+":checked")).map(i=>i.value);
-}
-
-function getExtraPrice(){
-  return Array.from(document.querySelectorAll('input[type=checkbox][data-extra]:checked'))
-    .reduce((sum, c)=>sum+Number(c.dataset.extra||0),0);
-}
-
-// ----------------------------------------------------
-// 核心讀取函式：強制載入最新訂單
-// ----------------------------------------------------
-async function loadPreviousOrders() {
-    try {
-        // 🚨 關鍵修正：加入隨機時間戳參數，強迫 Google 伺服器和瀏覽器不使用快取
-        const cacheBuster = `&v=${new Date().getTime()}`;
-        const urlWithCacheBuster = CSV_URL + cacheBuster;
-        
-        const response = await fetch(urlWithCacheBuster);
-        const text = await response.text();
-        
-        // 載入前清空現有訂單牆
-        wall.innerHTML = ''; 
-
-        // 將 CSV 數據分割成行，並移除標題行
-        const rows = text.trim().split('\n').slice(1); 
-        
-        rows.forEach(row => {
-            // 處理 CSV 的逗號分隔，同時處理逗號在引號內的狀況 (確保讀取正確)
-            const values = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)?.map(v => v.replace(/^"|"$/g, ''));
-            
-            if (!values || values.length < 6) return; 
-            
-            const name = values[1] || '無名氏';
-            const mainName = values[2] || '未選主菜';
-            const flavor = values[3] || '無口味';
-            // 配料和加料可能是多選，用逗號分隔
-            const toppings = values[4] ? values[4].split(',').join('、') : '無';
-            const extras = values[5] ? values[5].split(',').join('、') : '無';
-
-            const card = document.createElement('div');
-            card.className = 'order-card';
-            card.innerHTML = `
-                <h3>${name} (${values[0].substring(5, 16)})</h3>
-                <p><strong>主菜：</strong>${mainName}</p>
-                <p><strong>口味：：</strong>${flavor}</p>
-                <p><strong>配料：：</strong>${toppings}</p>
-                <p><strong>加料：：</strong>${extras}</p>
-                <p><strong>總價：</strong>(需手動計算)</p>
-            `;
-            wall.appendChild(card);
-        });
-
-    } catch (error) {
-        console.error('載入訂單失敗:', error);
-        wall.innerHTML = '<p style="color:red; text-align:center;">無法載入歷史訂單，請檢查 Google 試算表發布連結是否正確。</p>';
-    }
-}
-
-// ----------------------------------------------------
-// 頁面載入時，執行載入歷史訂單
-// ----------------------------------------------------
-window.onload = loadPreviousOrders;
-
-
-// ----------------------------------------------------
-// 點擊送出訂單
-// ----------------------------------------------------
-btn.onclick = ()=>{
-  const name = document.getElementById('userName').value.trim();
-  if(!name){ alert('請輸入名字'); return; }
-  const main = document.getElementById('mainDish');
-  const mainName = main.value;
-  const basePrice = Number(main.selectedOptions[0].dataset.price);
-  const flavor = document.getElementById('flavor').value;
-  const toppings = getCheckedValues('#toppings input');
-  const extras = getCheckedValues('input[type=checkbox][data-extra]');
-  const extraPrice = getExtraPrice();
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  const name = document.getElementById("userName").value.trim();
+  const main = document.getElementById("mainDish").value;
+  const basePrice = Number(document.getElementById("mainDish").selectedOptions[0].dataset.price);
+  const flavor = document.getElementById("flavor").value;
+  const toppings = Array.from(document.querySelectorAll('#toppings input:checked')).map(c=>c.value);
+  const extras = Array.from(document.querySelectorAll('input[data-extra]:checked')).map(c=>c.value);
+  const extraPrice = extras.reduce((sum, c)=> sum + Number(document.querySelector(`input[value='${c}']`).dataset.extra||0), 0);
   const total = basePrice + extraPrice;
 
-  // 1. 本地顯示新訂單
-  const card = document.createElement('div');
-  card.className = 'order-card';
-  card.innerHTML = `
-    <h3>${name}</h3>
-    <p><strong>主菜：</strong>${mainName}</p>
-    <p><strong>口味：</strong>${flavor}</p>
-    <p><strong>配料：</strong>${toppings.length?toppings.join('、'):'無'}</p>
-    <p><strong>加料：</strong>${extras.length?extras.join('、'):'無'}</p>
-    <p><strong>總價：</strong>NT$ ${total}</p>
-  `;
-  wall.appendChild(card);
-  
-  // 2. 提交訂單，同時處理多重提交和手機時序問題
-  submitted = true; 
-  setTimeout(function() {
-    document.querySelector('form').submit();
-  }, 1); 
-};
+  if(!name){
+    alert("請輸入名字！");
+    return;
+  }
+
+  const payload = {
+    name,
+    mainDish: main,
+    flavor,
+    toppings: toppings.join(","),
+    extras: extras.join(","),
+    total
+  };
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" }
+    });
+    const result = await res.json();
+    alert("✅ 訂單已送出！");
+
+    // 新增至本地畫面
+    const wall = document.getElementById("orderList");
+    const card = document.createElement("div");
+    card.className = "order-card";
+    card.innerHTML = `
+      <h3>${name}</h3>
+      <p><strong>主菜：</strong>${main}</p>
+      <p><strong>口味：</strong>${flavor}</p>
+      <p><strong>配料：</strong>${toppings.length ? toppings.join('、') : '無'}</p>
+      <p><strong>加料：</strong>${extras.length ? extras.join('、') : '無'}</p>
+      <p><strong>總價：</strong>NT$ ${total}</p>`;
+    wall.appendChild(card);
+
+  } catch (err) {
+    alert("❌ 傳送失敗，請稍後再試。");
+    console.error(err);
+  }
+});
 </script>
 </body>
 </html>
